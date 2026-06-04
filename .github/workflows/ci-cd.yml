@@ -55,7 +55,7 @@ jobs:
 
           cd /home/ubuntu/project/k8s
 
-          sed -i 's|DOCKER_USERNAME/demo-app:latest|${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}|g' deployment.yaml
+          sed -i 's|DOCKER_USERNAME/demo-app:latest|${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}|g' deployment.yml
 
           kubectl apply -f deployment.yml
 
