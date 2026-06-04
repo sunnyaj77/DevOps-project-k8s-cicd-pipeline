@@ -16,49 +16,48 @@ jobs:
 
     steps:
 
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Login To Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login To Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker Image
-      run: |
-        docker build \
-        -t ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }} .
+      - name: Build Docker Image
+        run: |
+          docker build \
+          -t ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }} .
 
-    - name: Push Docker Image
-      run: |
-        docker push \
-        ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}
+      - name: Push Docker Image
+        run: |
+          docker push \
+          ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}
 
-    - name: Copy Kubernetes Files
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        source: "k8s/*"
-        target: "/home/ubuntu/project"
+      - name: Deploy To Kubernetes
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
 
-    - name: Deploy To Minikube
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
+            echo "Checking cluster..."
 
-        script: |
+            kubectl get nodes
 
-          cd /home/ubuntu/project/k8s
+            echo "Updating deployment image..."
 
-          sed -i 's|DOCKER_USERNAME/demo-app:latest|${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}|g' deployment.yml
+            kubectl set image deployment/demo-app \
+            demo-app=${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}
 
-          kubectl apply -f deployment.yml
+            echo "Waiting for rollout..."
 
-          kubectl apply -f service.yml
+            kubectl rollout status deployment/demo-app
 
-          kubectl rollout status deployment/demo-app
+            echo "Deployment successful"
+
+            kubectl get pods
+
+            kubectl get svc
