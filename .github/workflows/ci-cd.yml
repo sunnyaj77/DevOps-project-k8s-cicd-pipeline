@@ -57,8 +57,8 @@ jobs:
 
           sed -i 's|DOCKER_USERNAME/demo-app:latest|${{ secrets.DOCKER_USERNAME }}/demo-app:${{ github.run_number }}|g' deployment.yaml
 
-          kubectl apply -f deployment.yaml
+          kubectl apply -f deployment.yml
 
-          kubectl apply -f service.yaml
+          kubectl apply -f service.yml
 
           kubectl rollout status deployment/demo-app
