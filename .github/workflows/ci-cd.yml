@@ -70,3 +70,5 @@ jobs:
 
             echo "Services:"
             kubectl get svc
+
+            kubectl port-forward service/demo-app-service 8080:3000 --address 0.0.0.0
