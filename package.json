@@ -1,0 +1,12 @@
+{
+  "name": "devops-project-1",
+  "version": "1.0.0",
+  "description": "GitHub Actions Docker Kubernetes Demo",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
