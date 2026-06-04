@@ -68,10 +68,6 @@ jobs:
             echo "===== Waiting For Rollout ====="
             kubectl rollout status deployment/demo-app
 
-            echo "===== Restarting Port Forward ====="
-
-            pkill -f "kubectl port-forward" || true
-
             nohup kubectl port-forward \
             service/demo-app-service \
             8080:3000 \
