@@ -23,7 +23,9 @@ spec:
 
       - name: demo-app
 
-        image: USERNAME/demo-app:latest
+        image: interviewcafe/demo-app:latest
+
+        imagePullPolicy: Always
 
         ports:
 
